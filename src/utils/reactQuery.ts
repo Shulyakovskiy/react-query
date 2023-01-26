@@ -1,14 +1,14 @@
 import { api } from './api';
+import { AxiosError, AxiosResponse } from 'axios';
+import { GetInfinitePagesInterface } from '../interfaces';
 import {
+  QueryFunctionContext,
   useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryOptions,
-} from 'react-query';
-import { QueryFunctionContext } from 'react-query/types/core/types';
-import { AxiosError, AxiosResponse } from 'axios';
-import { GetInfinitePagesInterface } from '../interfaces';
+  UseQueryOptions
+} from '@tanstack/react-query';
 
 type QueryKeyT = [string, object | undefined];
 
@@ -30,7 +30,7 @@ export const useLoadMore = <T>(url: string | null, params?: object) => {
     QueryKeyT
   >(
     [url!, params],
-    ({ queryKey, pageParam = 1 }) => fetcher({ queryKey, pageParam }),
+    ({ queryKey, pageParam = 1 }) => fetcher({meta: undefined, queryKey, pageParam }),
     {
       getPreviousPageParam: (firstPage) => firstPage.previousId ?? false,
       getNextPageParam: (lastPage) => {
@@ -45,14 +45,14 @@ export const useLoadMore = <T>(url: string | null, params?: object) => {
 export const usePrefetch = <T>(url: string | null, params?: object) => {
   const queryClient = useQueryClient();
 
-  return () => {
+  return async () => {
     if (!url) {
       return;
     }
 
-    queryClient.prefetchQuery<T, Error, T, QueryKeyT>(
+    await queryClient.prefetchQuery<T, Error, T, QueryKeyT>(
       [url!, params],
-      ({ queryKey }) => fetcher({ queryKey })
+      ({ queryKey }) => fetcher({meta: undefined, pageParam: undefined, queryKey })
     );
   };
 };
@@ -64,7 +64,7 @@ export const useFetch = <T>(
 ) => {
   const context = useQuery<T, Error, T, QueryKeyT>(
     [url!, params],
-    ({ queryKey }) => fetcher({ queryKey }),
+    ({ queryKey }) => fetcher({meta: undefined, pageParam: undefined, queryKey }),
     {
       enabled: !!url,
       ...config,
@@ -141,3 +141,4 @@ export const useUpdate = <T, S>(
     updater
   );
 };
+

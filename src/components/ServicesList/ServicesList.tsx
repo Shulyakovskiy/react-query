@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { ErrorBoundary } from 'react-error-boundary';
-import { QueryErrorResetBoundary } from 'react-query';
 import ServicesCheck from './ServicesCheck';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
 
 type Props = {
   checked: number[];

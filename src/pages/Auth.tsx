@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Box, Button, TextField, Typography } from '@mui/material';
 import { getTokenByPassword } from '../api/auth';
 import Cookies from 'js-cookie';
-import { useHistory } from 'react-router-dom';
 import { pageRoutes } from '../routes';
 import { toast } from 'react-toastify';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const [btnLoading, setBtnLoading] = useState(false);
@@ -17,7 +17,7 @@ const Auth = () => {
 
   useEffect(() => {
     if (Cookies.get('token')) {
-      history.replace(pageRoutes.main);
+      navigate(pageRoutes.main);
     }
   }, []);
 
@@ -28,7 +28,7 @@ const Auth = () => {
       const resp = await getTokenByPassword(email, password);
       if (resp.data.token) {
         Cookies.set('token', resp.data.token);
-        history.replace(pageRoutes.main);
+        navigate(pageRoutes.main);
         queryClient.invalidateQueries();
       } else {
         toast.error('Invalid details', {
