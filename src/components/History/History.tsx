@@ -33,7 +33,7 @@ const History = ({ id }: Props) => {
 
   return (
     <>
-      {data?.history.map((item) => (
+      {data?.history.map((item: any) => (
         <Typography variant="body1" key={item.date}>
           Date: {item.date} <br />
           Comment: {item.comment}

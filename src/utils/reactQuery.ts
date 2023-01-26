@@ -1,6 +1,6 @@
-import { api } from './api';
-import { AxiosError, AxiosResponse } from 'axios';
-import { GetInfinitePagesInterface } from '../interfaces';
+import {api} from './api';
+import {AxiosError, AxiosResponse} from 'axios';
+import {GetInfinitePagesInterface} from '../interfaces';
 import {
   QueryFunctionContext,
   useInfiniteQuery,
@@ -23,23 +23,21 @@ export const fetcher = <T>({
 };
 
 export const useLoadMore = <T>(url: string | null, params?: object) => {
-  const context = useInfiniteQuery<
-    GetInfinitePagesInterface<T>,
-    Error,
-    GetInfinitePagesInterface<T>,
-    QueryKeyT
+  return useInfiniteQuery<
+      GetInfinitePagesInterface<T>,
+      Error,
+      GetInfinitePagesInterface<T>,
+      QueryKeyT
   >(
-    [url!, params],
-    ({ queryKey, pageParam = 1 }) => fetcher({meta: undefined, queryKey, pageParam }),
-    {
-      getPreviousPageParam: (firstPage) => firstPage.previousId ?? false,
-      getNextPageParam: (lastPage) => {
-        return lastPage.nextId ?? false;
-      },
-    }
+      [url!, params],
+      ({queryKey, pageParam = 1}) => fetcher({meta: undefined, queryKey, pageParam}),
+      {
+        getPreviousPageParam: (firstPage) => firstPage.previousId ?? false,
+        getNextPageParam: (lastPage) => {
+          return lastPage.nextId ?? false;
+        },
+      }
   );
-
-  return context;
 };
 
 export const usePrefetch = <T>(url: string | null, params?: object) => {
@@ -62,16 +60,14 @@ export const useFetch = <T>(
   params?: object,
   config?: UseQueryOptions<T, Error, T, QueryKeyT>
 ) => {
-  const context = useQuery<T, Error, T, QueryKeyT>(
-    [url!, params],
-    ({ queryKey }) => fetcher({meta: undefined, pageParam: undefined, queryKey }),
-    {
-      enabled: !!url,
-      ...config,
-    }
+  return useQuery<T, Error, T, QueryKeyT>(
+      [url!, params],
+      ({queryKey}) => fetcher({meta: undefined, pageParam: undefined, queryKey}),
+      {
+        enabled: !!url,
+        ...config,
+      }
   );
-
-  return context;
 };
 
 const useGenericMutation = <T, S>(
@@ -97,8 +93,8 @@ const useGenericMutation = <T, S>(
     onError: (err, _, context) => {
       queryClient.setQueryData([url!, params], context);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries([url!, params]);
+    onSettled: async () => {
+      await queryClient.invalidateQueries([url!, params]);
     },
   });
 };
